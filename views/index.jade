@@ -1,5 +1,7 @@
 #top
-  button#startChat.btn-large.btn-primary(type='submit') Start!
+  form#startChat
+    input#username(type='text', placeholder='あんたの名前を知りたいねん')
+    input#startButton.btn-large.btn-primary(type='submit') Start!
 #main
   #messages_container
     table#messages.table

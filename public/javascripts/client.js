@@ -2,7 +2,11 @@ $(function () {
   var socket = null;
 
   var showMessage = function (message) {
-    $('table#messages').append('<tr class="message"><td>' + message + '</td></tr>');
+    if (typeof message === 'string') {
+      $('table#messages').append('<tr class="message">' + '<td></td>' + '<td>' + message + '</td></tr>');
+    } else {
+      $('table#messages').append('<tr class="message">' + '<td>' + message.username + '</td>' + '<td>' + message.content + '</td></tr>');
+    }
     return false;
   };
   
@@ -18,6 +22,7 @@ $(function () {
   // WebSocket
   var socketStart = function () {
     socket = io.connect(location.href);
+    socket.emit('username', $('#username').val());
     socket.emit('status', 'wait');
 
     socket.on('newMessage', function (message) {
@@ -27,7 +32,7 @@ $(function () {
     
     socket.on('status', function (message) {
       if (message === 'match') {
-        showMessage('Match!');
+        showMessage('相手が見つかったよ！チャット開始！');
         enableButton();
       }
     });
@@ -36,19 +41,28 @@ $(function () {
   // Event
   $('#main').hide();
 
-  $('button#startChat').click(function () {
-    $('#top').hide();
-    $('#main').show();
-    socketStart();
+  $('form#startChat').submit(function () {
+    var username = $('input#username').val();
+    if (username === undefined || username === '') {
+      alert('名前を入力しろや！');
+    } else {
+      $('#top').hide();
+      $('#main').show();
+      socketStart();
+    }
+    return false;
   });
 
   $('form#newMessage').submit(function(){
     var textBox = $('input#newText')
     var text = textBox.val();
-    textBox.val('');
+    if (text !== '') { 
+      textBox.val('');
 
-    socket.emit('newMessage', text);
+      socket.emit('newMessage', text);
+    }
     return false;
+
   });
 
 });

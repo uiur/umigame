@@ -29,20 +29,25 @@ app.configure('production', function(){
 });
 
 var queue = [];
-var rooms = {}
+var rooms = {};
+var users = {};
 
 // Socket
 io.sockets.on('connection', function (socket) {
-  socket.emit('newMessage', 'hi!');
+  socket.on('username', function (name) {
+    users[socket.id] = name;
+    socket.emit('newMessage', 'こんにちは！' + name + 'さん');
+  });
+
   socket.on('newMessage', function (message) {
     if (rooms[socket.id] !== undefined) { 
-      io.sockets.in(rooms[socket.id]).emit('newMessage', message);
+      io.sockets.in(rooms[socket.id]).emit('newMessage', {username: users[socket.id], content: message});
     }
   });
 
   socket.on('status', function (message) {
     if (message === 'wait') {
-      socket.emit('newMessage', 'Wait...');
+      socket.emit('newMessage', '相手を探しています。ちょっと待ってね〜');
       queue.push(socket.id);
       console.log(queue);
 
@@ -62,6 +67,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('disconnect', function () {
     delete rooms[socket.id];
+    delete users[socket.id];
   });
 });
 
