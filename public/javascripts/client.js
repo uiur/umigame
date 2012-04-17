@@ -1,11 +1,17 @@
 $(function () {
   var socket = null;
 
+  // Utility
+  var escapeHTML = function (val) {
+    return $('<div/>').text(val).html();
+  };
+
+  // View
   var showMessage = function (message) {
     if (typeof message === 'string') {
-      $('table#messages').append('<tr class="message">' + '<td></td>' + '<td>' + message + '</td></tr>');
+      $('table#messages').append('<tr class="message">' + '<td></td>' + '<td>' + escapeHTML(message) + '</td></tr>');
     } else {
-      $('table#messages').append('<tr class="message">' + '<td>' + message.username + '</td>' + '<td>' + message.content + '</td></tr>');
+      $('table#messages').append('<tr class="message">' + '<td>' + escapeHTML(message.username) + '</td>' + '<td>' + escapeHTML(message.content) + '</td></tr>');
     }
     return false;
   };
